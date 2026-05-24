@@ -4,4 +4,5 @@ Gustavo Rodrigues Siciliano — RM568419
 Gustavo de Jesus Silva — RM567926
 Samuel Keniti Kina de Lima — RM567614
 
-Link: 
+Link repositório Github: https://github.com/xGuga13x/Sprint4-Python
+Link vídeo Youtube: https://youtu.be/wNrw7_Wxrl0
