@@ -1,0 +1,96 @@
+-----------------------------------------------------------------------------------------------
+
+Professor! Este é o Script que utilizamos do banco, não é necessário fazer nenhuma alteração,
+pois tudo está conectado com o banco e automatizado.
+
+-----------------------------------------------------------------------------------------------
+
+CREATE TABLE tdb_Pessoa (
+
+    cpf VARCHAR2(14) NOT NULL,
+    nome VARCHAR2(80) NOT NULL,
+    data_nasc DATE,
+    telefone VARCHAR2(15),
+    email VARCHAR2(80),
+    cep VARCHAR2(9),
+    logradouro VARCHAR2(80),
+    numero VARCHAR2(8),
+    bairro VARCHAR2(50),
+    cidade VARCHAR2(50),
+    uf CHAR(2),
+    ativo CHAR(1) DEFAULT 'S' NOT NULL,
+    dt_cadastro DATE DEFAULT SYSDATE NOT NULL,
+    CONSTRAINT pk_tdb_Pessoa PRIMARY KEY (cpf),
+    CONSTRAINT uk_tdb_Pessoa_email UNIQUE (email),
+    CONSTRAINT ck_tdb_Pessoa_email CHECK (email IS NULL OR email LIKE '%@%'),
+    CONSTRAINT ck_tdb_Pessoa_ativo CHECK (ativo IN ('S','N')),
+    CONSTRAINT ck_tdb_Pessoa_uf CHECK (uf IS NULL OR LENGTH(TRIM(uf)) = 2)
+);
+ 
+CREATE TABLE tdb_Paciente (
+    id_paciente NUMBER NOT NULL,
+    cpf VARCHAR2(14) NOT NULL,
+    programa VARCHAR2(20) NOT NULL,
+    renda_familiar NUMBER(10,2),
+    convenio VARCHAR2(50),
+    distancia_km NUMBER(6,2),
+    turno_preferencial VARCHAR2(5),
+    observacoes VARCHAR2(150),
+    CONSTRAINT pk_tdb_Paciente PRIMARY KEY (id_paciente),
+    CONSTRAINT uk_tdb_Paciente_cpf UNIQUE (cpf),
+    CONSTRAINT uk_tdb_Paciente_id_cpf UNIQUE (id_paciente, cpf),
+    CONSTRAINT fk_tdb_Paciente_pessoa FOREIGN KEY (cpf)
+        REFERENCES tdb_Pessoa(cpf) ON DELETE CASCADE,
+    CONSTRAINT ck_tdb_Pac_renda CHECK (renda_familiar IS NULL OR renda_familiar >= 0),
+    CONSTRAINT ck_tdb_Pac_distancia CHECK (distancia_km IS NULL OR distancia_km >= 0),
+    CONSTRAINT ck_tdb_Pac_programa CHECK (programa IN ('DENTISTAS_DO_BEM','APOLONICAS_DO_BEM')),
+    CONSTRAINT ck_tdb_Pac_turno CHECK (turno_preferencial IS NULL OR turno_preferencial IN ('MANHA','TARDE','NOITE'))
+);
+ 
+CREATE TABLE tdb_Dentista (
+    cro VARCHAR2(20) NOT NULL,
+    cpf VARCHAR2(14) NOT NULL,
+    especialidade VARCHAR2(50),
+    disponibilidade VARCHAR2(80),
+    CONSTRAINT pk_tdb_Dentista PRIMARY KEY (cro, cpf),
+    CONSTRAINT uk_tdb_Dentista_cpf UNIQUE (cpf),
+    CONSTRAINT fk_tdb_Dentista_pessoa FOREIGN KEY (cpf)
+        REFERENCES tdb_Pessoa(cpf) ON DELETE CASCADE
+);
+ 
+CREATE TABLE tdb_Consulta (
+    id_consulta NUMBER NOT NULL,
+    id_paciente NUMBER NOT NULL,
+    cpf_paciente VARCHAR2(14) NOT NULL,
+    cro_dentista VARCHAR2(20) NOT NULL,
+    cpf_dentista VARCHAR2(14) NOT NULL,
+    data_consulta DATE NOT NULL,
+    horario VARCHAR2(5),
+    turno VARCHAR2(5),
+    status VARCHAR2(15) DEFAULT 'AGENDADA' NOT NULL,
+    tipo VARCHAR2(50),
+    distancia_km NUMBER(6,2),
+    observacoes VARCHAR2(150),
+    CONSTRAINT pk_tdb_Consulta PRIMARY KEY (id_consulta),
+    CONSTRAINT fk_tdb_Cons_paciente FOREIGN KEY (id_paciente, cpf_paciente)
+        REFERENCES tdb_Paciente(id_paciente, cpf) ON DELETE CASCADE,
+    CONSTRAINT fk_tdb_Cons_dentista FOREIGN KEY (cro_dentista, cpf_dentista)
+        REFERENCES tdb_Dentista(cro, cpf),
+    CONSTRAINT ck_tdb_Cons_status CHECK (status IN ('AGENDADA','REALIZADA','CANCELADA','FALTA')),
+    CONSTRAINT ck_tdb_Cons_turno CHECK (turno IS NULL OR turno IN ('MANHA','TARDE','NOITE')),
+    CONSTRAINT ck_tdb_Cons_distancia CHECK (distancia_km IS NULL OR distancia_km >= 0),
+    CONSTRAINT ck_tdb_Cons_horario CHECK (horario IS NULL OR REGEXP_LIKE(horario,'^([01][0-9]|2[0-3]):[0-5][0-9]$'))
+);
+ 
+CREATE TABLE tdb_Prontuario (
+    id_prontuario NUMBER NOT NULL,
+    id_consulta NUMBER NOT NULL,
+    descricao VARCHAR2(255) NOT NULL,
+    observacoes VARCHAR2(150),
+    dt_registro DATE DEFAULT SYSDATE NOT NULL,
+    ultima_alt DATE,
+    CONSTRAINT pk_tdb_Prontuario PRIMARY KEY (id_prontuario),
+    CONSTRAINT uk_tdb_Pront_consulta UNIQUE (id_consulta),
+    CONSTRAINT fk_tdb_Pront_consulta FOREIGN KEY (id_consulta)
+        REFERENCES tdb_Consulta(id_consulta) ON DELETE CASCADE
+);

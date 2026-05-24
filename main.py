@@ -1,8 +1,8 @@
 # Ponto de entrada do sistema Turma do Bem
 #
 # Gustavo Rodrigues Siciliano — RM568419
-# Gustavo de Jesus Silva      — RM567926
-# Samuel Keniti Kina de Lima  — RM567614
+# Gustavo de Jesus Silva — RM567926
+# Samuel Keniti Kina de Lima — RM567614
 #
 # Executar: python main.py
 
@@ -24,8 +24,8 @@ def cabecalho():
 
 {AZUL}Integrantes:{RESET}
   Gustavo Rodrigues Siciliano — RM568419
-  Gustavo de Jesus Silva      — RM567926
-  Samuel Keniti Kina de Lima  — RM567614
+  Gustavo de Jesus Silva — RM567926
+  Samuel Keniti Kina de Lima — RM567614
 """)
 
 
@@ -76,8 +76,7 @@ def main():
             '0': 'Sair',
         }, 'O QUE DESEJA FAZER?')
         if op == '0':
-            if conn:
-                conn.close()
+            conn.close()
             limpar()
             print(f'\n{VERDE}Sistema encerrado.{RESET}\n')
             break

@@ -1,11 +1,5 @@
 # Conexão e utilitários do banco Oracle
 
-try:
-    from dotenv import load_dotenv
-    load_dotenv()
-except ImportError:
-    pass  # python-dotenv opcional em produção (vars já injetadas pelo Render)
-
 import oracledb
 from config import DB_CONFIG, LARANJA, RESET
 
